@@ -26,10 +26,9 @@ arch = models.resnet50
 img_size = 224
 
 
-# Grab the dataset - uncomment the line to actually download the dataset and untar it
 path = Path('data')
 dataset_url = 'http://data.vision.ee.ethz.ch/cvl/food-101.tar.gz'
-#untar_data(dataset_url, 'food-101.tar.gz', path)
+untar_data(dataset_url, 'food-101.tar.gz', path)
 
 
 path = Path('data/food-101') #untar creates food-101 subdirectory
