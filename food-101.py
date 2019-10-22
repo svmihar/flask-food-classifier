@@ -17,6 +17,7 @@
 from fastai import *
 from fastai.vision import *
 from fastai.callbacks.hooks import *
+import subprocess as sp 
 
 
 # Set parameters here:
@@ -27,15 +28,16 @@ img_size = 224
 
 
 path = Path('data')
-dataset_url = 'https://s3.amazonaws.com/fast-ai-imageclas/food-101.tgz'
-untar_data(dataset_url, 'food-101.tar', path)
+#dataset_url = 'https://s3.amazonaws.com/fast-ai-imageclas/food-101'
+##untar_data url ended without the file extension!
+#untar_data(dataset_url, 'food-101.tgz', path)
 
 
 path = Path('data/food-101') 
 path_img = path/'images'
 
-train_path = 'data/food-101/meta/train.txt'
-test_path = 'data/food-101/meta/test.txt'
+train_path = 'data/food-101/train.txt'
+test_path = 'data/food-101/test.txt'
 
 def filelist2df(path):
     df = pd.read_csv(path, delimiter='/', header=None, names=['label', 'name'])
@@ -63,26 +65,12 @@ data = (ImageList.from_df(df=train_df, path=path/'images', cols=1)
         .normalize(imagenet_stats))
 
 
-# Let's visualize some examples in the dataset - these are with transformations applied:
-
-data.show_batch(rows=3, figsize=(10, 10))
-
-# Show one original image and then show several versions of that same image with the transformations applied. This helps to visualize what the transforms are doing. 
-
-
-
-img = open_image('data/food-101/images/apple_pie/157083.jpg')
-img.show()
-
-
 rows = 2
 cols = 6
 width = 15
 height = 9
 
 
-[img.apply_tfms(get_transforms()[0]).show(ax=ax) for i,ax in enumerate(plt.subplots(
-    rows,cols,figsize=(width,height))[1].flatten())];
 
 
 # Here is a list of the classes. We verify that there are 101 classes.
@@ -106,15 +94,11 @@ learn.lr_find()
 
 
 
-learn.recorder.plot(suggestion=True)
 
-
-# We train the model for 5 epochs at a time, occasionally reducing the learning rate. We are training only the last few layers that was added for transfer learning. 
-
-
+epoch = 10
 
 lr = 1e-2
-learn.fit_one_cycle(5, slice(lr))
+learn.fit_one_cycle(epoch, slice(lr))
 learn.save('food-101-test-e5')
 
 
@@ -125,11 +109,11 @@ learn.save('food-101-test-e5')
 learn.unfreeze()
 learn.lr_find()
 learn.recorder.plot(suggestion=True)
-learn.fit_one_cycle(5, max_lr=slice(1e-5, 1e-3))
+learn.fit_one_cycle(epoch, max_lr=slice(1e-5, 1e-3))
 learn.save('food-101-test-e10')
-learn.fit_one_cycle(5, max_lr=slice(1e-6, 1e-3))
+learn.fit_one_cycle(epoch, max_lr=slice(1e-6, 1e-3))
 learn.save('food-101-test-e15')
-learn.fit_one_cycle(5, max_lr=slice(1e-6, 1e-3))
+learn.fit_one_cycle(epoch, max_lr=slice(1e-6, 1e-3))
 learn.save('food-101-test-e20')
 
 
@@ -147,47 +131,28 @@ learn = create_cnn(data, arch, metrics=[accuracy, top_5], callback_fns=ShowGraph
 learn.load('food-101-test-e20')
 
 learn.lr_find()
-learn.recorder.plot(suggestion=True)
-
 
 # variation on learning rate
 learn.unfreeze()
-learn.fit_one_cycle(5, max_lr=slice(1e-7, 1e-2))
+learn.fit_one_cycle(epoch, max_lr=slice(1e-7, 1e-2))
 learn.save('food-101-test-e25-512')
 
 
 # variation on learning rate
 learn.unfreeze()
-learn.fit_one_cycle(5, max_lr=slice(1e-8, 1e-3))
+learn.fit_one_cycle(epoch, max_lr=slice(1e-8, 1e-3))
 learn.save('food-101-test-e30-512')
 
 
 # variation on learning rate
 learn.unfreeze()
-learn.fit_one_cycle(5, max_lr=slice(1e-9, 1e-4))
+learn.fit_one_cycle(epoch, max_lr=slice(1e-9, 1e-4))
 learn.save('food-101-test-e35-512')
 
 
-# We can visually look at some of the mispredictions and see if there is any conclusion that can be drawn from them. fastai has built in functions to display examples based on top losses, high/low probability. The confusion matrix is also useful to see what is commonly misclassified.
-
 
 interp = ClassificationInterpretation.from_learner(learn)
-
-
-interp.plot_top_losses(9, figsize=(15, 11))
-
-
-
-interp.most_confused(min_val=5)
-
-
-
-interp.plot_multi_top_losses()
-
-
-
-interp.plot_confusion_matrix(figsize=(20, 20), dpi=200)
-
+print(interp.most_confused(min_val=5))
 
 # Let's load the test set and evaluate using the model. 
 
