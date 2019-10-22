@@ -27,27 +27,12 @@ img_size = 224
 
 
 path = Path('data')
-dataset_url = 'http://data.vision.ee.ethz.ch/cvl/food-101.tar.gz'
-untar_data(dataset_url, 'food-101.tar.gz', path)
+dataset_url = 'https://s3.amazonaws.com/fast-ai-imageclas/food-101.tgz'
+untar_data(dataset_url, 'food-101.tar', path)
 
 
-path = Path('data/food-101') #untar creates food-101 subdirectory
+path = Path('data/food-101') 
 path_img = path/'images'
-
-
-# ## Food-101 dataset
-# The Food-101 dataset has 101 food categories, with 1000 images provided for each category for a total of 101,000 images. The Food-101 dataset provides a list of examples for training as well as another list for testing. Since the dataset specifies an equal amount of examples for each category, we do not need to worry about class imbalances. For each category, 250 images are in the test set and 750 for the training set. The training set is split into 20% for the validation set and 80% for the training set. 
-# 
-# Training set: 60600 images  
-# Validation set: 15150 images  
-# Test set: 25250 images  
-# 
-# The validation set is used to check the performance of the model after each training epoch. The test set is evaluated only once at the end of this notebook to provide a final accuracy score. 
-# 
-# The examples for each category are located in subdirectories with the category names. The file list is treated like a csv file, though now delimited with a '/' symbol. This is read using Pandas into a Pandas DataFrame structure and then is modified so that the paths and .jpg file extensions are added. Fast AI provides a way of reading the DataFrame structure and indicating that the labels are in column 0 and the examples are in column 1. 
-# 
-# The images are resized to 224x224 for faster training of the model. Data augmentation during training uses the default set of transforms provided by the Fast AI library as well as the default parameters. These are provided by the get_transforms() method. Since it's difficult to see what parameters and transforms are used from this method, the extracted list and parameters are provided below(ds_tfms). The pixel values of the examples are also normalized based on the ImageNet values. These examples could have been normalized by determining the mean & standard deviation of this specific dataset, but it appears that the ImageNet values were sufficient for a good result. 
-
 
 train_path = 'data/food-101/meta/train.txt'
 test_path = 'data/food-101/meta/test.txt'
@@ -102,12 +87,9 @@ height = 9
 
 # Here is a list of the classes. We verify that there are 101 classes.
 
-
 print(data.classes);
 print(data.c)
 
-
-# For metrics, we will look at the accuracy(top-1) and the top-5 accuracy(notated as top_k_accuracy). ResNet-50 and the its weights are used as a starting point for transfer learning. ResNet-50 is selected as it is a fairly  The Fast AI library then discards the classfication layer of the ResNet-50 model and then attaches a few additional layers. More information can be found [in the fastai documentation](https://docs.fast.ai/vision.learner.html#create_cnn)
 
 
 top_5 = partial(top_k_accuracy, k=5)
