@@ -2,7 +2,8 @@
 
 todo: 
 - [ ] buat flask 
-- [ ] train model 
+- [x] train model  --> resnet50, densenet
+- [ ] buat papermill untuk parametrize the ipynb
 
 
 ## deploying flask to azure
