@@ -3,8 +3,8 @@
 todo: 
 - [ ] buat flask 
 - [x] train model  --> resnet50, densenet
-- [ ] make the ipynb
-- [ ] buat papermill untuk parametrize the ipynb
+- [x] make the ipynb
+- [x] buat papermill untuk parametrize the ipynb
 
 ## models
 - resnet50 --> `model.pkl`
